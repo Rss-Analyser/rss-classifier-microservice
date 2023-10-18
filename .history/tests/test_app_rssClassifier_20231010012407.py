@@ -2,7 +2,7 @@ import requests
 import time
 import json
 
-BASE_URL = "http://127.0.0.1:5003"
+BASE_URL = "http://127.0.0.1:5000"
 
 # Define your custom classes and threshold here
 CLASSES = ["News", "Entertainment", "Sports", "Economy", "Technology", "Science", "Stock Market", "Reviews", "Business", "Finance"] # Replace with your desired classes

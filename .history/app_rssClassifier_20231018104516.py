@@ -48,7 +48,7 @@ def run_classification(classes, threshold):
     start_time = time.time()  # Update the start_time when the classification starts
 
     try:
-        classify_titles_from_db(cockroachdb_conn_str, classes, threshold, increment_func=increment_classified_count)
+        classify_titles_from_db(DATABASE_PATH, classes, threshold, increment_func=increment_classified_count)
 
     except Exception as e:
         print(f"Error during classification: {e}")
@@ -87,4 +87,4 @@ def get_status():
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5003)
+    app.run(debug=True, host='0.0.0.0', port=5000)

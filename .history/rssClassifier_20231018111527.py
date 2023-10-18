@@ -27,26 +27,19 @@ def classify_titles_from_db(cockroachdb_conn_str, classes, threshold=0.8, increm
     for table in tables:
         cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = %s;", (table,))
         columns = [column[0] for column in cursor.fetchall()]
-        
-        if 'class' not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN class TEXT;")
-            conn.commit()
-        if 'similarity' not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN similarity REAL;")
-            conn.commit()
-        if 'embedding' not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN embedding TEXT;")
-            conn.commit()
-
-        cursor.execute(f"SELECT rowid, Title FROM {table} WHERE class IS NULL OR class = '';")
+        if 'Class' not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN Class TEXT;")
+        if 'Similarity' not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN Similarity REAL;")
+        if 'Embedding' not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN Embedding TEXT;")  # Column to store serialized embedding
+        cursor.execute(f"SELECT rowid, Title FROM {table} WHERE Class IS NULL OR Class = '';")
         titles = cursor.fetchall()
-
-        
         
         for rowid, title in titles:
             classification, similarity, title_embedding_tensor = get_most_similar_class(title, class_embeddings, classes, threshold)
-            serialized_embedding = json.dumps(title_embedding_tensor.detach().cpu().numpy().tolist())
-            cursor.execute(f"UPDATE {table} SET Class = %s, Similarity = %s, Embedding = %s WHERE rowid = %s", (classification, similarity, serialized_embedding, rowid))
+            serialized_embedding = json.dumps(title_embedding_tensor.detach().cpu().numpy().tolist())  # Convert tensor to numpy array and then to list, followed by serialization
+            cursor.execute(f"UPDATE {table} SET Class = ?, Similarity = ?, Embedding = ? WHERE rowid = ?", (classification, similarity, serialized_embedding, rowid))
             
             if increment_func:
                 increment_func()

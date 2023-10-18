@@ -28,17 +28,13 @@ def classify_titles_from_db(cockroachdb_conn_str, classes, threshold=0.8, increm
         cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = %s;", (table,))
         columns = [column[0] for column in cursor.fetchall()]
         
-        if 'class' not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN class TEXT;")
-            conn.commit()
-        if 'similarity' not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN similarity REAL;")
-            conn.commit()
-        if 'embedding' not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN embedding TEXT;")
-            conn.commit()
-
-        cursor.execute(f"SELECT rowid, Title FROM {table} WHERE class IS NULL OR class = '';")
+        if 'Class' not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN Class TEXT;")
+        if 'Similarity' not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN Similarity REAL;")
+        if 'Embedding' not in columns:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN Embedding TEXT;")
+        cursor.execute(f"SELECT rowid, Title FROM {table} WHERE Class IS NULL OR Class = '';")
         titles = cursor.fetchall()
 
         

@@ -20,13 +20,7 @@ with open(CONFIG_PATH, 'r') as file:
     config = yaml.safe_load(file)
 
 
-cockroachdb_conn_str = "dbname=" + config['database'].get('dbname', '')
-if 'user' in config['database'] and config['database']['user']:
-    cockroachdb_conn_str += " user=" + config['database']['user']
-if 'password' in config['database'] and config['database']['password']:
-    cockroachdb_conn_str += " password=" + config['database']['password']
-cockroachdb_conn_str += " host=" + config['database'].get('host', '')
-cockroachdb_conn_str += " port=" + config['database'].get('port', '')
+DATABASE_PATH = config['database']['sqlite_path']
 
 DEFAULT_CLASSES = ["Breaking News", "Entertainment", "Sports", "Economy", "Technology", "Science", "Stock Market"]
 DEFAULT_THRESHOLD = 0.77
@@ -48,7 +42,7 @@ def run_classification(classes, threshold):
     start_time = time.time()  # Update the start_time when the classification starts
 
     try:
-        classify_titles_from_db(cockroachdb_conn_str, classes, threshold, increment_func=increment_classified_count)
+        classify_titles_from_db(DATABASE_PATH, classes, threshold, increment_func=increment_classified_count)
 
     except Exception as e:
         print(f"Error during classification: {e}")
@@ -87,4 +81,4 @@ def get_status():
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5003)
+    app.run(debug=True, host='0.0.0.0', port=5000)
